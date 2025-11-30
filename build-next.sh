@@ -9,18 +9,13 @@ NEXT_DIR="$SCRIPT_DIR/alasql-next"
 
 echo "🔧 Building AlaSQL NEXT from submodule..."
 
-# Check if submodule exists
-if [ ! -d "$NEXT_DIR" ]; then
-    echo "   Initializing submodule..."
-    git submodule update --init --recursive
-fi
+# Initialize and update submodule
+echo "   Initializing/updating submodule..."
+cd "$SCRIPT_DIR"
+git submodule update --init --recursive --remote
 
-# Update submodule to latest
-echo "   Updating submodule to latest..."
+# Go to submodule directory
 cd "$NEXT_DIR"
-git fetch origin
-git checkout develop
-git pull origin develop
 
 # Install dependencies
 echo "   Installing dependencies..."
