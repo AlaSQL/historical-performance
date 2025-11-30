@@ -5,7 +5,7 @@
 	"description": "Historical performance benchmarks for AlaSQL library across different npm versions",
 	"scripts": {
 		"bench-a": "./build-next.sh && bun run performance/benchmark-a/benchmark.js",
-		"bench-b": "./build-next.sh && bun run performance/benchmark-b/benchmark.js",
+		"bench-b": "./build-next.sh && bun test performance/benchmark-b/benchmark.test.js",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
@@ -72,7 +72,8 @@
 		"alasql-4.8.0": "npm:alasql@4.8.0",
 		"alasql-4.9.0": "npm:alasql@4.9.0",
 		"alasql-4.10.0": "npm:alasql@4.10.0",
-		"alasql-4.10.1": "npm:alasql@4.10.1"
+		"alasql-4.10.1": "npm:alasql@4.10.1",
+		"prettier": "^3.7.3"
 	},
 	"keywords": [
 		"alasql",
@@ -81,7 +82,12 @@
 		"sql"
 	],
 	"license": "MIT",
-	"dependencies": {
-		"prettier": "^3.7.3"
+	"prettier": {
+		"useTabs": true,
+		"printWidth": 100,
+		"singleQuote": true,
+		"arrowParens": "avoid",
+		"trailingComma": "es5",
+		"bracketSpacing": false
 	}
 }

@@ -5,7 +5,7 @@
  * Run with: yarn bench-a
  */
 
-import { versions, loadAlasqlNext } from "./versions.js";
+import { versions } from "./versions.js";
 import { testCases } from "./test-cases.js";
 import { runBenchmark } from "./runner.js";
 import {
@@ -36,15 +36,6 @@ function parseCycles() {
 async function main() {
   const iterations = parseCycles();
 
-  // Build list of versions to benchmark
-  const versionsToRun = [...versions];
-
-  // Always include NEXT version
-  const nextVersion = await loadAlasqlNext();
-  if (nextVersion) {
-    versionsToRun.push(nextVersion);
-  }
-
   console.log(
     "╔══════════════════════════════════════════════════════════════════════════════╗"
   );
@@ -58,7 +49,7 @@ async function main() {
     `║  Cycles per test: ${iterations}                                                        ║`
   );
   console.log(
-    `║  Versions: ${versionsToRun.map((v) => v.version).join(", ")}                     ║`
+    `║  Versions: ${versions.map((v) => v.version).join(", ")}                     ║`
   );
   console.log(
     "╚══════════════════════════════════════════════════════════════════════════════╝"
@@ -75,7 +66,7 @@ async function main() {
 
     const testResults = [];
 
-    for (const { name, version, alasql } of versionsToRun) {
+    for (const { name, version, alasql } of versions) {
       try {
         const result = runBenchmark(alasql, testCase, iterations);
         const opsPerSecond = (result.iterations / result.duration) * 1000;
@@ -117,7 +108,7 @@ async function main() {
   }
 
   // Calculate averages per version
-  const versionAverages = versionsToRun.map((v) => {
+  const versionAverages = versions.map((v) => {
     const versionResults = allResults.filter((r) => r.version === v.version);
     const avgOps =
       versionResults.reduce((sum, r) => sum + r.opsPerSecond, 0) /
@@ -130,7 +121,7 @@ async function main() {
 
   // Print summary and detailed results
   printSummary(versionAverages);
-  printDetailedResults(versionsToRun, testCases, allResults);
+  printDetailedResults(versions, testCases, allResults);
 }
 
 main().catch(console.error);

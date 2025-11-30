@@ -67,9 +67,7 @@ import alasql480 from "alasql-4.8.0";
 import alasql490 from "alasql-4.9.0";
 import alasql4100 from "alasql-4.10.0";
 import alasql4101 from "alasql-4.10.1";
-
-import * as path from "path";
-import * as fs from "fs";
+import alasqlNext from "../../alasql-next/dist/alasql.fs.js";
 
 /**
  * @typedef {Object} VersionedAlaSQL
@@ -144,50 +142,5 @@ export const versions = [
   { name: "alasql-4.9.0", version: "4.9.0", alasql: alasql490 },
   { name: "alasql-4.10.0", version: "4.10.0", alasql: alasql4100 },
   { name: "alasql-4.10.1", version: "4.10.1", alasql: alasql4101 },
+  { name: "alasql-next", version: "NEXT", alasql: alasqlNext },
 ];
-
-/**
- * Load the NEXT version of AlaSQL from the submodule
- * @returns {Promise<VersionedAlaSQL|null>}
- */
-export async function loadAlasqlNext() {
-  try {
-    const nextDir = path.join(process.cwd(), "alasql-next");
-    const distPath = path.join(nextDir, "dist", "alasql.js");
-
-    if (!fs.existsSync(distPath)) {
-      return null;
-    }
-
-    // Get commit hash
-    const { execSync } = await import("child_process");
-    const commitHash = execSync("git rev-parse --short HEAD", {
-      cwd: nextDir,
-      encoding: "utf-8",
-    }).trim();
-
-    const moduleNext = await import(distPath);
-    const alasql = moduleNext.default || moduleNext;
-
-    return {
-      name: "alasql-next",
-      version: `NEXT-${commitHash}`,
-      alasql,
-    };
-  } catch (error) {
-    return null;
-  }
-}
-
-/**
- * Get all versions including NEXT if available
- * @returns {Promise<VersionedAlaSQL[]>}
- */
-export async function getAllVersions() {
-  const allVersions = [...versions];
-  const nextVersion = await loadAlasqlNext();
-  if (nextVersion) {
-    allVersions.push(nextVersion);
-  }
-  return allVersions;
-}

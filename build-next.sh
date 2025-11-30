@@ -26,14 +26,9 @@ git pull origin develop
 echo "   Installing dependencies..."
 npm install
 
-# Build - prefer build-only if available
-if npm run | grep -q "build-only"; then
-    echo "   Building with build-only..."
-    npm run build-only
-else
-    echo "   Building..."
-    npm run build
-fi
+# Build
+echo "   Building..."
+./build.sh
 
 # Get commit hash
 COMMIT_HASH=$(git rev-parse --short HEAD)
