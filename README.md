@@ -152,7 +152,7 @@ The summary table shows average operations per second as plain integers:
 The detailed results are in markdown table format with versions as rows and tests as columns:
 
 ```
-| | Simple SELECT (100 rows) | WHERE Filtering (1000 rows) | ... | total |
+| | Simple SELECT (100 rows) | WHERE Filtering (1000 rows) | ... | Total |
 | --- | --- | --- | --- | --- |
 | v0.3.10 ops/s | 22290 | 2510 | ... | 45678 |
 | v0.4.12 ops/s | 26800 | 2400 | ... | 48123 |

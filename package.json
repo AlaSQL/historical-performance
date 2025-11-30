@@ -5,7 +5,8 @@
 	"description": "Historical performance benchmarks for AlaSQL library across different npm versions",
 	"scripts": {
 		"benchmark": "bun run benchmark.ts",
-		"ben": "bun benchmark"
+		"bench": "bun benchmark",
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
 		"alasql-0.3.10": "npm:alasql@0.3.10",
@@ -79,5 +80,8 @@
 		"benchmark",
 		"sql"
 	],
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+		"prettier": "^3.7.3"
+	}
 }
