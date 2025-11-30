@@ -8,6 +8,10 @@ lerna-debug.log*
 bun.lockb
 package-lock.json
 
+# AlaSQL NEXT build artifacts
+alasql-next/node_modules/
+alasql-next/dist/
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
