@@ -226,7 +226,7 @@ async function loadBleedingEdgeAlaSQL(): Promise<VersionedAlaSQL | null> {
     
     // Load the built module
     // Note: This imports code from the official AlaSQL repository that was
-    // cloned and built locally. The user explicitly opts in with --bleeding-edge.
+    // cloned and built locally.
     const distPath = path.join(BLEEDING_EDGE_DIR, 'dist', 'alasql.js');
     if (!fs.existsSync(distPath)) {
       throw new Error(`Built file not found at ${distPath}`);
@@ -473,17 +473,14 @@ function parseCycles(): number {
 // Main benchmark runner
 async function main() {
   const iterations = parseCycles();
-  const includeBleedingEdge = process.argv.includes('--bleeding-edge');
   
   // Build list of versions to benchmark
   const versionsToRun: VersionedAlaSQL[] = [...versions];
   
-  // Add bleeding-edge version if requested
-  if (includeBleedingEdge) {
-    const bleedingEdge = await loadBleedingEdgeAlaSQL();
-    if (bleedingEdge) {
-      versionsToRun.push(bleedingEdge);
-    }
+  // Always include bleeding-edge version
+  const bleedingEdge = await loadBleedingEdgeAlaSQL();
+  if (bleedingEdge) {
+    versionsToRun.push(bleedingEdge);
   }
   
   console.log('╔══════════════════════════════════════════════════════════════════════════════╗');

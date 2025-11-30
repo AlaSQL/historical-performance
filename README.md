@@ -71,22 +71,14 @@ bun run benchmark.ts --cycles 10  # Run 10 cycles per test
 bun run benchmark.ts --cycles 100 # Run 100 cycles per test
 ```
 
-### Run with Bleeding-Edge AlaSQL
-
-This will clone the latest AlaSQL source from GitHub, build it, and include it in the benchmark:
-
-```bash
-bun run benchmark:bleeding-edge
-```
-
 ### Run Directly with Bun
 
 ```bash
 bun run benchmark.ts
 bun run benchmark.ts --cycles 25
-bun run benchmark.ts --bleeding-edge
-bun run benchmark.ts --cycles 10 --bleeding-edge
 ```
+
+The benchmark automatically includes the bleeding-edge AlaSQL version by cloning and building the latest code from the [AlaSQL GitHub repository](https://github.com/AlaSQL/alasql).
 
 ## How It Works
 

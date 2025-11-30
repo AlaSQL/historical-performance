@@ -4,8 +4,7 @@
   "type": "module",
   "description": "Historical performance benchmarks for AlaSQL library across different npm versions",
   "scripts": {
-    "benchmark": "bun run benchmark.ts",
-    "benchmark:bleeding-edge": "bun run benchmark.ts --bleeding-edge"
+    "benchmark": "bun run benchmark.ts"
   },
   "devDependencies": {
     "alasql-0.3.10": "npm:alasql@0.3.10",
