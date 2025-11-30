@@ -8,12 +8,30 @@ This project uses [Bun](https://bun.sh/) to benchmark various AlaSQL versions ac
 
 ## Versions Tested
 
-- `0.4.11` - Early version
-- `1.7.5` - First 1.x release
-- `2.0.0` - Major version 2
-- `3.0.0` - Major version 3
-- `4.0.0` - Major version 4
-- `4.10.1` - Latest version
+64 versions across all major releases (sorted by semver):
+
+### 0.x Series
+- `0.3.10`, `0.4.12`, `0.5.10`, `0.6.7`, `0.7.1`
+
+### 1.x Series
+- `1.7.4`, `1.7.5`
+
+### 2.x Series
+- `2.1.4`, `2.1.6`, `2.1.7`, `2.1.8`, `2.2.1`, `2.2.5`, `2.3.0`, `2.5.0`, `2.5.1`, `2.5.3`, `2.5.4`
+
+### 3.x Series
+- `3.0.0`, `3.1.0`, `3.1.1`
+
+### 4.x Series
+- `4.0.0`, `4.0.2`, `4.0.4`, `4.0.5`, `4.0.6`
+- `4.1.0`, `4.1.1`, `4.1.2`, `4.1.3`, `4.1.4`, `4.1.5`, `4.1.7`, `4.1.8`, `4.1.9`, `4.1.10`, `4.1.11`
+- `4.2.1`, `4.2.2`, `4.2.3`, `4.2.4`, `4.2.5`, `4.2.6`, `4.2.7`
+- `4.3.0`, `4.3.1`, `4.3.2`, `4.3.3`
+- `4.4.0`
+- `4.5.0`, `4.5.1`, `4.5.2`
+- `4.6.0`, `4.6.1`, `4.6.2`, `4.6.3`, `4.6.4`, `4.6.5`, `4.6.6`
+- `4.7.0`, `4.8.0`, `4.9.0`
+- `4.10.0`, `4.10.1`
 
 ## Test Cases
 
@@ -66,12 +84,10 @@ The project uses npm aliasing to install multiple AlaSQL versions:
 ```json
 {
   "devDependencies": {
-    "alasql-0.4.11": "npm:alasql@0.4.11",
-    "alasql-1.7.5": "npm:alasql@1.7.5",
-    "alasql-2.0.0": "npm:alasql@2.0.0",
-    "alasql-3.0.0": "npm:alasql@3.0.0",
-    "alasql-4.0.0": "npm:alasql@4.0.0",
+    "alasql-0.3.10": "npm:alasql@0.3.10",
+    "alasql-0.4.12": "npm:alasql@0.4.12",
     "alasql-4.10.1": "npm:alasql@4.10.1"
+    // ... 64 versions total
   }
 }
 ```
@@ -79,8 +95,9 @@ The project uses npm aliasing to install multiple AlaSQL versions:
 Each version can then be imported separately:
 
 ```typescript
-import alasql0411 from 'alasql-0.4.11';
-import alasql175 from 'alasql-1.7.5';
+import alasql0310 from 'alasql-0.3.10';
+import alasql0412 from 'alasql-0.4.12';
+import alasql4101 from 'alasql-4.10.1';
 // ... etc
 ```
 
@@ -94,16 +111,18 @@ The benchmark produces formatted output showing performance metrics for each ver
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  Mode: Quick                                                                 ║
 ║  Iterations per test: 10                                                     ║
-║  Versions: 0.4.11, 1.7.5, 2.0.0, 3.0.0, 4.0.0, 4.10.1                        ║
+║  Versions: 0.3.10, 0.4.12, ... 4.10.0, 4.10.1                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Test: Simple SELECT (100 rows)
    Basic SELECT * query on a small dataset of 100 rows
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ✅ v0.4.11   │   495.63µs │     20.18K ops/s
-   ✅ v1.7.5    │   476.93µs │     20.97K ops/s
+   ✅ v0.3.10   │   448.67µs │     22.29K ops/s
+   ✅ v0.4.12   │   373.20µs │     26.80K ops/s
    ...
+   ✅ v4.10.1   │   501.28µs │     19.95K ops/s
+   🏆 Best: v0.4.12 (26.80K ops/s)
 ```
 
 ## Adding New Versions
