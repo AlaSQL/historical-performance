@@ -11,18 +11,23 @@ This project uses [Bun](https://bun.sh/) to benchmark various AlaSQL versions ac
 64 versions across all major releases (sorted by semver):
 
 ### 0.x Series
+
 - `0.3.10`, `0.4.12`, `0.5.10`, `0.6.7`, `0.7.1`
 
 ### 1.x Series
+
 - `1.7.4`, `1.7.5`
 
 ### 2.x Series
+
 - `2.1.4`, `2.1.6`, `2.1.7`, `2.1.8`, `2.2.1`, `2.2.5`, `2.3.0`, `2.5.0`, `2.5.1`, `2.5.3`, `2.5.4`
 
 ### 3.x Series
+
 - `3.0.0`, `3.1.0`, `3.1.1`
 
 ### 4.x Series
+
 - `4.0.0`, `4.0.2`, `4.0.4`, `4.0.5`, `4.0.6`
 - `4.1.0`, `4.1.1`, `4.1.2`, `4.1.3`, `4.1.4`, `4.1.5`, `4.1.7`, `4.1.8`, `4.1.9`, `4.1.10`, `4.1.11`
 - `4.2.1`, `4.2.2`, `4.2.3`, `4.2.4`, `4.2.5`, `4.2.6`, `4.2.7`
@@ -78,7 +83,7 @@ bun run benchmark.ts
 bun run benchmark.ts --cycles 25
 ```
 
-The benchmark automatically includes the bleeding-edge AlaSQL version by cloning and building the latest code from the [AlaSQL GitHub repository](https://github.com/AlaSQL/alasql).
+The benchmark automatically includes the AlaSQL NEXT version by cloning and building the latest code from the [AlaSQL GitHub repository](https://github.com/AlaSQL/alasql).
 
 ## How It Works
 
@@ -98,9 +103,9 @@ The project uses npm aliasing to install multiple AlaSQL versions:
 Each version can then be imported separately:
 
 ```typescript
-import alasql0310 from 'alasql-0.3.10';
-import alasql0412 from 'alasql-0.4.12';
-import alasql4101 from 'alasql-4.10.1';
+import alasql0310 from "alasql-0.3.10";
+import alasql0412 from "alasql-0.4.12";
+import alasql4101 from "alasql-4.10.1";
 // ... etc
 ```
 
@@ -158,16 +163,19 @@ The detailed results are in markdown table format with versions as rows and test
 To add a new AlaSQL version to benchmark:
 
 1. Add it to `package.json`:
+
    ```json
    "alasql-X.Y.Z": "npm:alasql@X.Y.Z"
    ```
 
 2. Import it in `benchmark.ts`:
+
    ```typescript
-   import alasqlXYZ from 'alasql-X.Y.Z';
+   import alasqlXYZ from "alasql-X.Y.Z";
    ```
 
 3. Add it to the `versions` array:
+
    ```typescript
    { name: 'alasql-X.Y.Z', version: 'X.Y.Z', alasql: alasqlXYZ as AlaSQLInstance },
    ```
