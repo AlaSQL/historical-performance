@@ -5,7 +5,7 @@
   "description": "Historical performance benchmarks for AlaSQL library across different npm versions",
   "scripts": {
     "benchmark": "bun run benchmark.ts",
-    "benchmark:quick": "bun run benchmark.ts --quick"
+    "benchmark:bleeding-edge": "bun run benchmark.ts --bleeding-edge"
   },
   "devDependencies": {
     "alasql-0.3.10": "npm:alasql@0.3.10",

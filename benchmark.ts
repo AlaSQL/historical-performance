@@ -5,6 +5,10 @@
  * ranging from simple to advanced queries.
  */
 
+import { execSync } from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
+
 // Import all AlaSQL versions with aliases
 import alasql0310 from 'alasql-0.3.10';
 import alasql0412 from 'alasql-0.4.12';
@@ -171,6 +175,69 @@ const versions: VersionedAlaSQL[] = [
   { name: 'alasql-4.10.0', version: '4.10.0', alasql: alasql4100 as AlaSQLInstance },
   { name: 'alasql-4.10.1', version: '4.10.1', alasql: alasql4101 as AlaSQLInstance },
 ];
+
+// Bleeding-edge AlaSQL support
+const ALASQL_REPO_URL = 'https://github.com/AlaSQL/alasql.git';
+const BLEEDING_EDGE_DIR = path.join(process.cwd(), '.alasql-bleeding-edge');
+
+async function loadBleedingEdgeAlaSQL(): Promise<VersionedAlaSQL | null> {
+  try {
+    console.log('🔧 Building bleeding-edge AlaSQL from GitHub...');
+    
+    // Clone or update the repository
+    if (fs.existsSync(BLEEDING_EDGE_DIR)) {
+      console.log('   Updating existing clone...');
+      execSync('git fetch origin && git reset --hard origin/develop', {
+        cwd: BLEEDING_EDGE_DIR,
+        stdio: 'pipe',
+      });
+    } else {
+      console.log('   Cloning repository...');
+      execSync(`git clone --depth 1 --branch develop ${ALASQL_REPO_URL} ${BLEEDING_EDGE_DIR}`, {
+        stdio: 'pipe',
+      });
+    }
+    
+    // Install dependencies and build
+    console.log('   Installing dependencies...');
+    execSync('npm install', {
+      cwd: BLEEDING_EDGE_DIR,
+      stdio: 'pipe',
+    });
+    
+    console.log('   Building...');
+    execSync('npm run build-only', {
+      cwd: BLEEDING_EDGE_DIR,
+      stdio: 'pipe',
+    });
+    
+    // Get the commit hash for version identification
+    const commitHash = execSync('git rev-parse --short HEAD', {
+      cwd: BLEEDING_EDGE_DIR,
+      encoding: 'utf-8',
+    }).trim();
+    
+    // Load the built module
+    const distPath = path.join(BLEEDING_EDGE_DIR, 'dist', 'alasql.js');
+    if (!fs.existsSync(distPath)) {
+      throw new Error(`Built file not found at ${distPath}`);
+    }
+    
+    const bleedingEdgeModule = await import(distPath);
+    const alasql = bleedingEdgeModule.default || bleedingEdgeModule;
+    
+    console.log(`   ✅ Bleeding-edge build complete (commit: ${commitHash})`);
+    
+    return {
+      name: 'alasql-bleeding-edge',
+      version: `bleeding-edge (${commitHash})`,
+      alasql: alasql as AlaSQLInstance,
+    };
+  } catch (error) {
+    console.error(`   ❌ Failed to build bleeding-edge AlaSQL: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    return null;
+  }
+}
 
 // Helper function to generate test data
 function generateUsers(count: number): Array<{ id: number; name: string; age: number; department: string; salary: number }> {
@@ -382,17 +449,39 @@ function formatOps(ops: number): string {
   return ops.toFixed(2);
 }
 
+// Parse cycles from command line
+function parseCycles(): number {
+  const cyclesIndex = process.argv.findIndex(arg => arg === '--cycles');
+  if (cyclesIndex !== -1 && process.argv[cyclesIndex + 1]) {
+    const cycles = parseInt(process.argv[cyclesIndex + 1], 10);
+    if (!isNaN(cycles) && cycles > 0) {
+      return cycles;
+    }
+  }
+  return 50; // Default to 50 cycles
+}
+
 // Main benchmark runner
 async function main() {
-  const isQuickMode = process.argv.includes('--quick');
-  const iterations = isQuickMode ? 10 : 50;
+  const iterations = parseCycles();
+  const includeBleedingEdge = process.argv.includes('--bleeding-edge');
+  
+  // Build list of versions to benchmark
+  const versionsToRun: VersionedAlaSQL[] = [...versions];
+  
+  // Add bleeding-edge version if requested
+  if (includeBleedingEdge) {
+    const bleedingEdge = await loadBleedingEdgeAlaSQL();
+    if (bleedingEdge) {
+      versionsToRun.push(bleedingEdge);
+    }
+  }
   
   console.log('╔══════════════════════════════════════════════════════════════════════════════╗');
   console.log('║           AlaSQL Historical Performance Benchmark                            ║');
   console.log('╠══════════════════════════════════════════════════════════════════════════════╣');
-  console.log(`║  Mode: ${isQuickMode ? 'Quick' : 'Full'}                                                                       ║`);
-  console.log(`║  Iterations per test: ${iterations}                                                        ║`);
-  console.log(`║  Versions: ${versions.map(v => v.version).join(', ')}                     ║`);
+  console.log(`║  Cycles per test: ${iterations}                                                        ║`);
+  console.log(`║  Versions: ${versionsToRun.map(v => v.version).join(', ')}                     ║`);
   console.log('╚══════════════════════════════════════════════════════════════════════════════╝');
   console.log('');
   
@@ -406,7 +495,7 @@ async function main() {
     
     const testResults: BenchmarkResult[] = [];
     
-    for (const { name, version, alasql } of versions) {
+    for (const { name, version, alasql } of versionsToRun) {
       try {
         const result = runBenchmark(alasql, testCase, iterations);
         const opsPerSecond = (result.iterations / result.duration) * 1000;
@@ -441,7 +530,7 @@ async function main() {
   console.log(`${'═'.repeat(80)}`);
   
   // Calculate averages per version
-  const versionAverages = versions.map(v => {
+  const versionAverages = versionsToRun.map(v => {
     const versionResults = allResults.filter(r => r.version === v.version);
     const avgOps = versionResults.reduce((sum, r) => sum + r.opsPerSecond, 0) / versionResults.length;
     return { version: v.version, avgOps };
@@ -454,26 +543,35 @@ async function main() {
   console.log('   ─────┼───────────┼──────────────');
   versionAverages.forEach((v, i) => {
     const medal = getMedal(i);
-    console.log(`   ${medal} ${(i + 1).toString().padStart(2)} │ v${v.version.padEnd(8)} │ ${formatOps(v.avgOps).padStart(10)} ops/s`);
+    console.log(`   ${medal} ${(i + 1).toString().padStart(2)} │ v${v.version.padEnd(8)} │ ${Math.round(v.avgOps).toString().padStart(10)}`);
   });
   
-  // Detailed results table
+  // Detailed results table - markdown format with versions as rows
   console.log(`\n\n${'═'.repeat(80)}`);
   console.log('📋 DETAILED RESULTS');
   console.log(`${'═'.repeat(80)}\n`);
   
-  // Create a matrix view
-  const header = ['Test Case', ...versions.map(v => `v${v.version}`)];
-  console.log('   ' + header.map(h => h.padEnd(COLUMN_WIDTH)).join('│ '));
-  console.log('   ' + header.map(() => '─'.repeat(COLUMN_WIDTH)).join('┼─'));
+  // Build markdown table with tests as columns
+  const testNames = testCases.map(tc => tc.name);
   
-  for (const testCase of testCases) {
-    const row = [testCase.name.substring(0, COLUMN_WIDTH - 1)];
-    for (const v of versions) {
-      const result = allResults.find(r => r.version === v.version && r.testName === testCase.name);
-      row.push(result ? `${formatOps(result.opsPerSecond)} ops/s` : 'N/A');
+  // Print markdown table header
+  const headerCols = ['', ...testNames, 'total'];
+  console.log('| ' + headerCols.join(' | ') + ' |');
+  console.log('| ' + headerCols.map(() => '---').join(' | ') + ' |');
+  
+  // Print each version as a row
+  for (const v of versionsToRun) {
+    const versionResults = allResults.filter(r => r.version === v.version);
+    const rowValues: number[] = [];
+    
+    for (const testCase of testCases) {
+      const result = versionResults.find(r => r.testName === testCase.name);
+      rowValues.push(result ? Math.round(result.opsPerSecond) : 0);
     }
-    console.log('   ' + row.map(c => c.padEnd(COLUMN_WIDTH)).join('│ '));
+    
+    const total = rowValues.reduce((sum, val) => sum + val, 0);
+    const rowLabel = `v${v.version} ops/s`;
+    console.log('| ' + [rowLabel, ...rowValues.map(v => v.toString()), total.toString()].join(' | ') + ' |');
   }
   
   console.log(`\n${'═'.repeat(80)}`);

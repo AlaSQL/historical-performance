@@ -8,6 +8,9 @@ lerna-debug.log*
 bun.lockb
 package-lock.json
 
+# Bleeding-edge AlaSQL clone
+.alasql-bleeding-edge/
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

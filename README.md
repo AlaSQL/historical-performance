@@ -64,17 +64,28 @@ bun install
 bun run benchmark
 ```
 
-### Run Quick Benchmark (fewer iterations)
+### Run with Custom Cycles
 
 ```bash
-bun run benchmark:quick
+bun run benchmark.ts --cycles 10  # Run 10 cycles per test
+bun run benchmark.ts --cycles 100 # Run 100 cycles per test
+```
+
+### Run with Bleeding-Edge AlaSQL
+
+This will clone the latest AlaSQL source from GitHub, build it, and include it in the benchmark:
+
+```bash
+bun run benchmark:bleeding-edge
 ```
 
 ### Run Directly with Bun
 
 ```bash
 bun run benchmark.ts
-bun run benchmark.ts --quick
+bun run benchmark.ts --cycles 25
+bun run benchmark.ts --bleeding-edge
+bun run benchmark.ts --cycles 10 --bleeding-edge
 ```
 
 ## How It Works
@@ -109,8 +120,7 @@ The benchmark produces formatted output showing performance metrics for each ver
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║           AlaSQL Historical Performance Benchmark                            ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
-║  Mode: Quick                                                                 ║
-║  Iterations per test: 10                                                     ║
+║  Cycles per test: 50                                                         ║
 ║  Versions: 0.3.10, 0.4.12, ... 4.10.0, 4.10.1                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -123,6 +133,32 @@ The benchmark produces formatted output showing performance metrics for each ver
    ...
    ✅ v4.10.1   │   501.28µs │     19.95K ops/s
    🏆 Best: v0.4.12 (26.80K ops/s)
+```
+
+### SUMMARY Section
+
+The summary table shows average operations per second as plain integers:
+
+```
+📈 SUMMARY - Average Operations per Second by Version
+═══════════════════════════════════════════════════════════════════════════════
+
+   Rank │ Version   │ Avg Ops/s
+   ─────┼───────────┼──────────────
+   🥇  1 │ v4.2.5    │      12500
+   🥈  2 │ v4.10.1   │      12000
+   🥉  3 │ v4.10.0   │      11800
+```
+
+### DETAILED RESULTS Section
+
+The detailed results are in markdown table format with versions as rows and tests as columns:
+
+```
+| | Simple SELECT (100 rows) | WHERE Filtering (1000 rows) | ... | total |
+| --- | --- | --- | --- | --- |
+| v0.3.10 ops/s | 22290 | 2510 | ... | 45678 |
+| v0.4.12 ops/s | 26800 | 2400 | ... | 48123 |
 ```
 
 ## Adding New Versions
