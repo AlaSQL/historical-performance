@@ -187,6 +187,7 @@ async function loadBleedingEdgeAlaSQL(): Promise<VersionedAlaSQL | null> {
     // Clone or update the repository
     if (fs.existsSync(BLEEDING_EDGE_DIR)) {
       console.log('   Updating existing clone...');
+      // Reset to origin/develop - this is an auto-managed directory
       execSync('git fetch origin && git reset --hard origin/develop', {
         cwd: BLEEDING_EDGE_DIR,
         stdio: 'pipe',
@@ -205,8 +206,14 @@ async function loadBleedingEdgeAlaSQL(): Promise<VersionedAlaSQL | null> {
       stdio: 'pipe',
     });
     
+    // Determine which build command to use
+    // build-only skips formatting checks, but may not exist in older versions
+    const packageJsonPath = path.join(BLEEDING_EDGE_DIR, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+    const buildCommand = packageJson.scripts?.['build-only'] ? 'npm run build-only' : 'npm run build';
+    
     console.log('   Building...');
-    execSync('npm run build-only', {
+    execSync(buildCommand, {
       cwd: BLEEDING_EDGE_DIR,
       stdio: 'pipe',
     });
@@ -218,6 +225,8 @@ async function loadBleedingEdgeAlaSQL(): Promise<VersionedAlaSQL | null> {
     }).trim();
     
     // Load the built module
+    // Note: This imports code from the official AlaSQL repository that was
+    // cloned and built locally. The user explicitly opts in with --bleeding-edge.
     const distPath = path.join(BLEEDING_EDGE_DIR, 'dist', 'alasql.js');
     if (!fs.existsSync(distPath)) {
       throw new Error(`Built file not found at ${distPath}`);
