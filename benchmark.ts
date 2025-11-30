@@ -13,7 +13,13 @@ import alasql300 from 'alasql-3.0.0';
 import alasql400 from 'alasql-4.0.0';
 import alasql4101 from 'alasql-4.10.1';
 
-// Type definitions
+// Configuration constants
+const COLUMN_WIDTH = 15;
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+function getMedal(rank: number): string {
+  return rank < MEDALS.length ? MEDALS[rank] : '  ';
+}
 interface AlaSQLInstance {
   (query: string, params?: unknown[]): unknown;
 }
@@ -67,13 +73,14 @@ function generateUsers(count: number): Array<{ id: number; name: string; age: nu
 
 function generateOrders(count: number, maxUserId: number): Array<{ id: number; userId: number; product: string; amount: number; date: string }> {
   const products = ['Laptop', 'Phone', 'Tablet', 'Monitor', 'Keyboard', 'Mouse', 'Headphones', 'Camera'];
+  const currentYear = new Date().getFullYear();
   
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
     userId: (i % maxUserId) + 1,
     product: products[i % products.length],
     amount: 10 + (i * 7) % 990,
-    date: `2024-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
+    date: `${currentYear}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`,
   }));
 }
 
@@ -330,7 +337,7 @@ async function main() {
   console.log('\n   Rank │ Version   │ Avg Ops/s');
   console.log('   ─────┼───────────┼──────────────');
   versionAverages.forEach((v, i) => {
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '  ';
+    const medal = getMedal(i);
     console.log(`   ${medal} ${(i + 1).toString().padStart(2)} │ v${v.version.padEnd(8)} │ ${formatOps(v.avgOps).padStart(10)} ops/s`);
   });
   
@@ -341,16 +348,16 @@ async function main() {
   
   // Create a matrix view
   const header = ['Test Case', ...versions.map(v => `v${v.version}`)];
-  console.log('   ' + header.map(h => h.padEnd(15)).join('│ '));
-  console.log('   ' + header.map(() => '─'.repeat(15)).join('┼─'));
+  console.log('   ' + header.map(h => h.padEnd(COLUMN_WIDTH)).join('│ '));
+  console.log('   ' + header.map(() => '─'.repeat(COLUMN_WIDTH)).join('┼─'));
   
   for (const testCase of testCases) {
-    const row = [testCase.name.substring(0, 14)];
+    const row = [testCase.name.substring(0, COLUMN_WIDTH - 1)];
     for (const v of versions) {
       const result = allResults.find(r => r.version === v.version && r.testName === testCase.name);
       row.push(result ? `${formatOps(result.opsPerSecond)} ops/s` : 'N/A');
     }
-    console.log('   ' + row.map(c => c.padEnd(15)).join('│ '));
+    console.log('   ' + row.map(c => c.padEnd(COLUMN_WIDTH)).join('│ '));
   }
   
   console.log(`\n${'═'.repeat(80)}`);

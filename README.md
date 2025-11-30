@@ -86,6 +86,8 @@ import alasql175 from 'alasql-1.7.5';
 
 ## Sample Output
 
+The benchmark produces formatted output showing performance metrics for each version (actual results will vary based on your machine):
+
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║           AlaSQL Historical Performance Benchmark                            ║
