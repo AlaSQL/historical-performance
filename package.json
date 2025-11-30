@@ -1,0 +1,25 @@
+{
+  "name": "alasql-historical-performance",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Historical performance benchmarks for AlaSQL library across different npm versions",
+  "scripts": {
+    "benchmark": "bun run benchmark.ts",
+    "benchmark:quick": "bun run benchmark.ts --quick"
+  },
+  "devDependencies": {
+    "alasql-0.4.11": "npm:alasql@0.4.11",
+    "alasql-1.7.5": "npm:alasql@1.7.5",
+    "alasql-2.0.0": "npm:alasql@2.0.0",
+    "alasql-3.0.0": "npm:alasql@3.0.0",
+    "alasql-4.0.0": "npm:alasql@4.0.0",
+    "alasql-4.10.1": "npm:alasql@4.10.1"
+  },
+  "keywords": [
+    "alasql",
+    "performance",
+    "benchmark",
+    "sql"
+  ],
+  "license": "MIT"
+}
