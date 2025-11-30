@@ -6,37 +6,33 @@ Performance benchmarks comparing different npm versions of the [AlaSQL](https://
 
 This project uses [Bun](https://bun.sh/) to benchmark various AlaSQL versions across a range of SQL operations, from simple queries to complex aggregations. It uses npm aliasing to install multiple versions of AlaSQL simultaneously.
 
+## Project Structure
+
+```
+├── alasql-next/              # Git submodule - latest AlaSQL from develop branch
+├── performance/
+│   ├── benchmark-a/          # Custom benchmark with detailed output
+│   │   ├── benchmark.js      # Main entry point
+│   │   ├── versions.js       # AlaSQL version imports
+│   │   ├── test-cases.js     # SQL test cases
+│   │   ├── runner.js         # Benchmark execution logic
+│   │   ├── data-generators.js # Test data generation
+│   │   └── formatters.js     # Output formatting
+│   └── benchmark-b/          # Bun native benchmark
+│       ├── benchmark.js      # Uses Bun's bench/group/run
+│       ├── versions.js       # AlaSQL version imports
+│       └── data-generators.js # Test data generation
+├── build-next.sh             # Script to build NEXT version from submodule
+└── package.json
+```
+
 ## Versions Tested
 
-64 versions across all major releases (sorted by semver):
+64 npm versions across all major releases, plus the NEXT version (latest from develop branch):
 
-### 0.x Series
-
-- `0.3.10`, `0.4.12`, `0.5.10`, `0.6.7`, `0.7.1`
-
-### 1.x Series
-
-- `1.7.4`, `1.7.5`
-
-### 2.x Series
-
-- `2.1.4`, `2.1.6`, `2.1.7`, `2.1.8`, `2.2.1`, `2.2.5`, `2.3.0`, `2.5.0`, `2.5.1`, `2.5.3`, `2.5.4`
-
-### 3.x Series
-
-- `3.0.0`, `3.1.0`, `3.1.1`
-
-### 4.x Series
-
-- `4.0.0`, `4.0.2`, `4.0.4`, `4.0.5`, `4.0.6`
-- `4.1.0`, `4.1.1`, `4.1.2`, `4.1.3`, `4.1.4`, `4.1.5`, `4.1.7`, `4.1.8`, `4.1.9`, `4.1.10`, `4.1.11`
-- `4.2.1`, `4.2.2`, `4.2.3`, `4.2.4`, `4.2.5`, `4.2.6`, `4.2.7`
-- `4.3.0`, `4.3.1`, `4.3.2`, `4.3.3`
-- `4.4.0`
-- `4.5.0`, `4.5.1`, `4.5.2`
-- `4.6.0`, `4.6.1`, `4.6.2`, `4.6.3`, `4.6.4`, `4.6.5`, `4.6.6`
-- `4.7.0`, `4.8.0`, `4.9.0`
-- `4.10.0`, `4.10.1`
+### 0.x - 4.x Series
+- `0.3.10` through `4.10.1` (64 versions total)
+- `NEXT` - Latest code from the AlaSQL develop branch
 
 ## Test Cases
 
@@ -49,43 +45,49 @@ This project uses [Bun](https://bun.sh/) to benchmark various AlaSQL versions ac
 
 ## Prerequisites
 
-- [Bun](https://bun.sh/) runtime (recommended) or Node.js 18+
-- npm or bun package manager
+- [Bun](https://bun.sh/) runtime
+- Git (for submodule management)
+- npm or yarn
 
 ## Installation
 
 ```bash
+# Clone with submodules
+git clone --recurse-submodules <repo-url>
+cd historical-performance
+
 # Install dependencies
-npm install
-# or
 bun install
+# or
+yarn install
 ```
 
 ## Usage
 
-### Run Full Benchmark
+### Benchmark A - Custom Implementation
+
+Custom benchmark with detailed console output, summary tables, and markdown results.
 
 ```bash
-bun run benchmark
+yarn bench-a
 ```
 
-### Run with Custom Cycles
+With custom cycles:
+```bash
+yarn bench-a --cycles 10
+```
+
+### Benchmark B - Bun Native
+
+Uses Bun's native `bench`, `group`, and `run` functions for performance measurement.
 
 ```bash
-bun run benchmark.ts --cycles 10  # Run 10 cycles per test
-bun run benchmark.ts --cycles 100 # Run 100 cycles per test
+yarn bench-b
 ```
-
-### Run Directly with Bun
-
-```bash
-bun run benchmark.ts
-bun run benchmark.ts --cycles 25
-```
-
-The benchmark automatically includes the AlaSQL NEXT version by cloning and building the latest code from the [AlaSQL GitHub repository](https://github.com/AlaSQL/alasql).
 
 ## How It Works
+
+### Version Management
 
 The project uses npm aliasing to install multiple AlaSQL versions:
 
@@ -93,52 +95,39 @@ The project uses npm aliasing to install multiple AlaSQL versions:
 {
   "devDependencies": {
     "alasql-0.3.10": "npm:alasql@0.3.10",
-    "alasql-0.4.12": "npm:alasql@0.4.12",
     "alasql-4.10.1": "npm:alasql@4.10.1"
-    // ... 64 versions total
   }
 }
 ```
 
-Each version can then be imported separately:
+### NEXT Version
 
-```typescript
-import alasql0310 from "alasql-0.3.10";
-import alasql0412 from "alasql-0.4.12";
-import alasql4101 from "alasql-4.10.1";
-// ... etc
-```
+The NEXT version is managed as a git submodule pointing to the AlaSQL develop branch. The `build-next.sh` script handles:
 
-## Sample Output
+1. Updating the submodule to latest
+2. Installing dependencies
+3. Building the distribution
 
-The benchmark produces formatted output showing performance metrics for each version (actual results will vary based on your machine):
+## Sample Output (Benchmark A)
 
 ```
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║           AlaSQL Historical Performance Benchmark                            ║
+║           AlaSQL Historical Performance Benchmark (A)                        ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  Cycles per test: 50                                                         ║
-║  Versions: 0.3.10, 0.4.12, ... 4.10.0, 4.10.1                                ║
+║  Versions: 0.3.10, 0.4.12, ... 4.10.1, NEXT-abc123                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Test: Simple SELECT (100 rows)
-   Basic SELECT * query on a small dataset of 100 rows
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ✅ v0.3.10   │   448.67µs │     22.29K ops/s
-   ✅ v0.4.12   │   373.20µs │     26.80K ops/s
-   ...
    ✅ v4.10.1   │   501.28µs │     19.95K ops/s
    🏆 Best: v0.4.12 (26.80K ops/s)
 ```
 
 ### SUMMARY Section
 
-The summary table shows average operations per second as plain integers:
-
 ```
 📈 SUMMARY - Average Operations per Second by Version
-═══════════════════════════════════════════════════════════════════════════════
 
    Rank │ Version   │ Avg Ops/s
    ─────┼───────────┼──────────────
@@ -149,38 +138,33 @@ The summary table shows average operations per second as plain integers:
 
 ### DETAILED RESULTS Section
 
-The detailed results are in markdown table format with versions as rows and tests as columns:
-
 ```
 | | Simple SELECT (100 rows) | WHERE Filtering (1000 rows) | ... | Total |
 | --- | --- | --- | --- | --- |
 | v0.3.10 ops/s | 22290 | 2510 | ... | 45678 |
-| v0.4.12 ops/s | 26800 | 2400 | ... | 48123 |
+| vNEXT-abc123 ops/s | 26800 | 2400 | ... | 48123 |
 ```
 
 ## Adding New Versions
 
-To add a new AlaSQL version to benchmark:
+To add a new AlaSQL version:
 
-1. Add it to `package.json`:
-
+1. Add to `package.json`:
    ```json
    "alasql-X.Y.Z": "npm:alasql@X.Y.Z"
    ```
 
-2. Import it in `benchmark.ts`:
-
-   ```typescript
+2. Import in both `performance/benchmark-a/versions.js` and `performance/benchmark-b/versions.js`:
+   ```javascript
    import alasqlXYZ from "alasql-X.Y.Z";
    ```
 
-3. Add it to the `versions` array:
-
-   ```typescript
-   { name: 'alasql-X.Y.Z', version: 'X.Y.Z', alasql: alasqlXYZ as AlaSQLInstance },
+3. Add to the `versions` array in both files:
+   ```javascript
+   { name: "alasql-X.Y.Z", version: "X.Y.Z", alasql: alasqlXYZ },
    ```
 
-4. Run `npm install` or `bun install` and then run the benchmark.
+4. Run `bun install` or `yarn install`
 
 ## License
 

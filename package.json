@@ -4,8 +4,8 @@
 	"type": "module",
 	"description": "Historical performance benchmarks for AlaSQL library across different npm versions",
 	"scripts": {
-		"benchmark": "bun run benchmark.ts",
-		"bench": "bun benchmark",
+		"bench-a": "./build-next.sh && bun run performance/benchmark-a/benchmark.js",
+		"bench-b": "./build-next.sh && bun run performance/benchmark-b/benchmark.js",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {

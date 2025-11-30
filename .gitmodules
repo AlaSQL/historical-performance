@@ -1,0 +1,4 @@
+[submodule "alasql-next"]
+	path = alasql-next
+	url = https://github.com/AlaSQL/alasql.git
+	branch = develop
